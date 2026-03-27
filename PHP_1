@@ -1,0 +1,113 @@
+Để xây dựng một trang web nội bộ (Intranet) cơ bản, bạn có thể bắt đầu với một hệ thống quản lý nhân viên đơn giản sử dụng PHP và MySQL. Dưới đây là đoạn code mẫu giúp bạn tạo một trang hiển thị danh sách nhân sự, rất phù hợp cho môi trường văn phòng hoặc quản lý hệ thống IT.
+
+### 1. Cấu trúc Database (SQL)
+Trước tiên, bạn cần tạo một bảng để lưu trữ thông tin.
+
+```sql
+CREATE DATABASE noi_bo;
+USE noi_bo;
+
+CREATE TABLE nhan_vien (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ho_ten VARCHAR(100),
+    chuc_vu VARCHAR(50),
+    phong_ban VARCHAR(50),
+    email VARCHAR(100)
+);
+
+INSERT INTO nhan_vien (ho_ten, chuc_vu, phong_ban, email) VALUES
+('Nguyễn Văn A', 'Quản trị mạng', 'Phòng IT', 'a.nguyen@company.com'),
+('Trần Thị B', 'Kế toán trưởng', 'Phòng Tài chính', 'b.tran@company.com');
+```
+
+---
+
+### 2. Mã nguồn PHP (`index.php`)
+Đoạn code này sẽ kết nối cơ sở dữ liệu và hiển thị dữ liệu dưới dạng bảng HTML sạch sẽ.
+
+```php
+<?php
+// Kết nối Database
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db   = "noi_bo";
+
+$conn = new mysqli($host, $user, $pass, $db);
+
+if ($conn->connect_error) {
+    die("Kết nối thất bại: " . $conn->connect_error);
+}
+
+// Lấy danh sách nhân viên
+$sql = "SELECT * FROM nhan_vien";
+$result = $conn->query($sql);
+?>
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Cổng Thông Tin Nội Bộ</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 40px; }
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #007bff; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        .header { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Danh bạ Nhân viên Nội bộ</h1>
+    <p>Hệ thống hỗ trợ tra cứu nhanh thông tin phòng ban.</p>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Họ và Tên</th>
+            <th>Chức vụ</th>
+            <th>Phòng ban</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                echo "<tr>
+                        <td>" . $row["id"]. "</td>
+                        <td>" . $row["ho_ten"]. "</td>
+                        <td>" . $row["chuc_vu"]. "</td>
+                        <td>" . $row["phong_ban"]. "</td>
+                        <td>" . $row["email"]. "</td>
+                      </tr>";
+            }
+        } else {
+            echo "<tr><td colspan='5'>Không có dữ liệu</td></tr>";
+        }
+        ?>
+    </tbody>
+</table>
+
+</body>
+</html>
+
+<?php $conn->close(); ?>
+```
+
+---
+
+### Một số lưu ý để vận hành tốt:
+* **Bảo mật:** Với web nội bộ, bạn nên tích hợp thêm xác thực **LDAP/Active Directory** để nhân viên dùng chung tài khoản Windows khi đăng nhập.
+* **Môi trường:** Bạn có thể triển khai nhanh trên server Ubuntu hoặc RHEL hiện có bằng cách cài đặt stack **LAMP** (Linux, Apache, MySQL, PHP).
+* **Tính năng thêm:** Bạn có thể phát triển thêm các module như:
+    * Tra cứu sơ đồ mạng (Network Topology).
+    * Quản lý mượn thiết bị IT.
+    * Thông báo nội bộ từ ban giám đốc.
+
+Bạn có muốn tôi hướng dẫn cách kết nối file PHP này với **Active Directory (LDAP)** để tự động hóa việc đăng nhập cho nhân viên không?
